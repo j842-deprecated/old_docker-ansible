@@ -3,8 +3,6 @@
 FROM phusion/baseimage
 MAINTAINER j842
 
-#ADD ["./assets","/"]
-
 RUN apt-get update && apt-get install -y apt-transport-https software-properties-common python-apt python-pycurl python-httplib2 
 RUN apt-get install -y build-essential libssl-dev libffi-dev python-dev python-pip git
 
@@ -18,6 +16,7 @@ RUN ln -s /root/.ssh /sshkeys
 RUN ln -s /root/ansible /data
 
 RUN grep -q '^export EDITOR' /root/.bashrc && sed -i 's/^export EDITOR.*/export EDITOR=nano/' /root/.bashrc || echo 'export EDITOR=nano' >> /root/.bashrc
+ADD ["./assets","/"]
 
 VOLUME ["/sshkeys","/data"]
 EXPOSE 22
