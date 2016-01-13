@@ -16,8 +16,8 @@ RUN ln -s /root/.ssh /sshkeys
 RUN ln -s /root/ansible /data
 
 RUN grep -q '^export EDITOR' /root/.bashrc && sed -i 's/^export EDITOR.*/export EDITOR=nano/' /root/.bashrc || echo 'export EDITOR=nano' >> /root/.bashrc
-ADD ["./assets","/"]
+#ADD ["./assets","/"]
 
-VOLUME ["/sshkeys","/data"]
+VOLUME ["/sshkeys","/data","/root/.ansible.cfg"]
 EXPOSE 22
 CMD ["/sbin/my_init"]
