@@ -1,6 +1,6 @@
-# ansible #
+# docker-ansible #
 
-A simple docker container to run Ansible, accessable via ssh (authorized_keys).
+A simple docker container to run Ansible, accessable via ssh (authorized_keys). Available in Docker Hub as j842/ansible and github as j842/docker-ansible.
 
 
 ```
