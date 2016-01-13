@@ -1,4 +1,4 @@
-# attic.
+# Ansible in a Docker container, accessed via ssh.
 
 FROM phusion/baseimage
 MAINTAINER j842
@@ -16,6 +16,8 @@ RUN /etc/my_init.d/00_regen_ssh_host_keys.sh
 RUN rm -rf /root/.ssh
 RUN ln -s /root/.ssh /sshkeys
 RUN ln -s /root/ansible /data
+
+RUN grep -q '^export EDITOR' /root/.bashrc && sed -i 's/^export EDITOR.*/export EDITOR=nano/' /root/.bashrc || echo 'export EDITOR=nano' >> /root/.bashrc
 
 VOLUME ["/sshkeys","/data"]
 EXPOSE 22
