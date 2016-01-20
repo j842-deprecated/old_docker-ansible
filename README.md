@@ -13,7 +13,7 @@ Next you need to run the following scripts in bin:
 | copykeys PATH        | Copy all files from PATH into /root/.ssh in the docker container.   |   
 | setconfig CONFIGFILE | Set the ansible configuration file (/root/.ansible.cfg)             |  
 
-Having completed the above you should be able to run ansible, ansible-playbook etc from the host.
+Having completed the above you should be ready to run ansible, ansible-playbook etc from the host.
 
 The ansible config file defaults to:
 ```
@@ -22,4 +22,4 @@ host_key_checking = false
 pipelining = true
 ```
 
-By default no SSH keys are installed. Use copykeys to copy across suitable keys.
+By default no SSH keys are installed (use copykeys to copy across suitable keys).
