@@ -6,7 +6,7 @@ In bin directory are a bunch of helper scripts. The ones needed are:
 
 | Script               | Descrption | 
 |----------------------|---------------------------------------------------------------------|
-| install              | Install docker and add scripts to /usr/local/bin for accessing ansible. | 
+| install              | Add scripts to /usr/local/bin for accessing ansible. | 
 | init                 | Initialise the Docker storage volume for the ansible settings       | 
 | copykeys PATH        | Copy all files from PATH into /root/.ssh in the docker container.   |   
 | setconfig CONFIGFILE | Set the ansible configuration file (/root/.ansible.cfg)             |  

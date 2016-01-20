@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Script to install docker and the 842/ansible container on a clean
-# Debian machine.
+# Script to install the ansible commands on a clean Debian machine.
+# Uses the Docker-Ansible image. Assumes Docker is already installed.
 # Should be idempotent and suitable for use from Ansible.
 
 # return value:
@@ -9,35 +9,25 @@
 #     1 if error
 #     3 if nothing changed
 
-if [ "$EUID" -ne 0 ]
-  then echo "Please run as root"
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+. $DIR/bash.conf
+
+IMAGENAME="j842/ansible"
+RVAL=3
+
+# check we're root on Debian and Docker is installed
+if [ "$EUID" -ne 0 ]; then 
+  echo "Please run as root"
   exit 1
 fi
-
 if [ $(uname -rv | grep -c "Debian") -eq 0 ]; then
   echo "This script is only for Debian hosts."
   exit 1
 fi
-
-
-IMAGENAME="j842/ansible"
-RVAL=3
-UPDATED=0
-
-echo "Checking installation of Docker and Docker-Ansible..."
-
-# install package if it doesn't exist, updating cache
-function checkinstall {
-if [ $(dpkg-query -W -f='${Status}' ${1} 2>/dev/null | grep -c "ok installed") -eq 0 ];
-then
-  if [ ${UPDATED} -eq 0 ]; then
-	apt-get update
-	UPDATED=1
-  fi
-  apt-get install -y ${1};
-  RVAL=0
+if [ which docker ]; then 
+  echo "Docker needs to be installed first."
+  exit 1
 fi
-}
 
 # create a command which is run via docker
 function makefile {
@@ -45,35 +35,20 @@ function makefile {
     cat <<EOF | tr -s ' ' >/usr/local/bin/$1 
 #!/bin/bash
 
-docker run --name=ansible -ti --rm                              \
-       -v "/root/dockeransible/ansible:/data"                   \
-       -v "/root/dockeransible/sshkeys:/sshkeys"                \
-       -v "/root/dockeransible/ansible.cfg:/root/.ansible.cfg"  \
+docker run --name=ansible -ti                           \
+       -v "${VOLUME_NAME}:/config"                      \
        ${IMAGENAME} /usr/local/bin/ansiblerun $1 \$@
+docker rm ansible  > /dev/null
 EOF
     chmod a+x /usr/local/bin/$1
+    echo "Created /usr/local/bin/$1"
     RVAL=0
 fi 
 }
 
-# ------------ INSTALL DOCKER --------------------------
-
-if [ ! -e /usr/local/bin/install_docker.sh ]; then
-   checkinstall wget
-   wget -nv -O /usr/local/bin/install_docker.sh \
-        https://raw.github.com/j842/scripts/master/install_docker.sh
-   chmod u+x /usr/local/bin/install_docker.sh
-   RVAL=0
-fi
-
-echo "Checking Docker..."
-
-/usr/local/bin/install_docker.sh
-RVAL=$?
-
 # ------------ CONFIGURE ANSIBLE CONTAINER --------------------------
 
-# configure ansible commands
+# configure those ansible commands
 COMMANDS=(ansible ansible-doc ansible-galaxy ansible-playbook ansible-pull ansible-vault)
 for CMD in ${COMMANDS[@]}; do
   makefile $CMD

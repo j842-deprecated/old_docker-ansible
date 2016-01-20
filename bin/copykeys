@@ -4,7 +4,8 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 
 function getmd5 {
-  MD5=$(docker run --rm --name ansiblecopy -v ansible-config:/config ${CONTAINER_NAME} tar c config/sshkeys | md5sum)
+  MD5=$(docker run --name ansiblecopy -v ${VOLUME_NAME}:/config ${CONTAINER_NAME} tar c config/sshkeys | md5sum)
+  docker rm ansiblecopy > /dev/null
 }
 
 function showusage {
@@ -40,13 +41,14 @@ fi
 
   
 # add the directory
-# -- docker cp does not work on new volume containers. docker cp ${1}/ ansible-config:/config/sshkeys
+# -- docker cp does not work on the new volume containers. >.<
 echo "Copying from ${1}."
 
 getmd5
 OLDMD5=${MD5}
 
-docker run --name ansiblecopy -v ansible-config:/config -v ${1}:/tmp/sshkeys ${CONTAINER_NAME} /bin/cp -a /tmp/sshkeys/ /config
+# can't use --rm or it kills the volume container. :/
+docker run --name ansiblecopy -v ${VOLUME_NAME}:/config -v ${1}:/tmp/sshkeys ${CONTAINER_NAME} /bin/cp -a /tmp/sshkeys/ /config
 RVAL=$?
 docker rm ansiblecopy > /dev/null
   

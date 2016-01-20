@@ -37,7 +37,7 @@ fi
 # add the file
 rm -rf /tmp/ansible ; mkdir /tmp/ansible ; cp $1 /tmp/ansible
 
-docker run --name ansiblecopy -v ansible-config:/config -v /tmp/ansible:/tmp/ansible ${CONTAINER_NAME} \
+docker run --name ansiblecopy -v ${VOLUME_NAME}:/config -v /tmp/ansible:/tmp/ansible ${CONTAINER_NAME} \
    /bin/bash /usr/local/bin/updateconfig.sh
 RVAL=$?
 
