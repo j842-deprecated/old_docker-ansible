@@ -5,13 +5,16 @@ A simple docker container to run Ansible. Available in Docker Hub as j842/ansibl
 
 Example:
 ```
-docker run -d -v "$(pwd)/data:/data" -v "$(pwd)/sshkeys:/sshkeys" j842/ansible ansiblerun COMMAND [OPTIONS]...
-
+docker run -ti --rm -v "$(pwd)/data:/data" -v "$(pwd)/sshkeys:/sshkeys" j842/ansible ansiblerun COMMAND [OPTIONS]...
 ```
 
 Script to do basic setup on a clean debian host:
 ```
 #!/bin/bash
+
+# set this to where you want to store the data on the host (or edit usage below if you 
+# want to use docker volumes)
+HOSTROOT="/ansible"
 
 # install package if it doesn't exist, updating cache
 function checkinstall {
@@ -28,9 +31,9 @@ cat <<EOF | tr -s ' ' >/usr/local/bin/$1
 #!/bin/bash
 
 docker run --name=ansible -ti --rm                              \
-       -v "/root/dockeransible/ansible:/data"                   \
-       -v "/root/dockeransible/sshkeys:/sshkeys"                \
-       -v "/root/dockeransible/ansible.cfg:/root/.ansible.cfg"  \
+       -v "$HOSTROOT/ansible:/data"                   \
+       -v "$HOSTROOT/sshkeys:/sshkeys"                \
+       -v "$HOSTROOT/ansible.cfg:/root/.ansible.cfg"  \
        j842/docker-ansible /usr/local/bin/ansiblerun $1 \$@
 EOF
 chmod a+x /usr/local/bin/$1
