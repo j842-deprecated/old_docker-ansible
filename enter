@@ -1,4 +1,4 @@
-sudo docker run -it j842/ansible /bin/bash
+docker run -it j842/ansible /bin/bash
 
 
 

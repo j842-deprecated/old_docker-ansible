@@ -1,0 +1,7 @@
+#!/bin/bash
+
+cd /data
+CMD=$1
+shift
+#echo [${CMD}] $@
+${CMD} $@
