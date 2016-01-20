@@ -12,9 +12,7 @@ Script to do basic setup on a clean debian host:
 ```
 #!/bin/bash
 
-# set this to where you want to store the data on the host (or edit usage below if you 
-# want to use docker volumes)
-HOSTROOT="/ansible"
+IMAGENAME="j842/ansible"
 
 # install package if it doesn't exist, updating cache
 function checkinstall {
@@ -25,16 +23,16 @@ then
 fi
 }
 
-# create a command run via docker
+# create a command which is run via docker
 function makefile {
 cat <<EOF | tr -s ' ' >/usr/local/bin/$1 
 #!/bin/bash
 
 docker run --name=ansible -ti --rm                              \
-       -v "$HOSTROOT/ansible:/data"                   \
-       -v "$HOSTROOT/sshkeys:/sshkeys"                \
-       -v "$HOSTROOT/ansible.cfg:/root/.ansible.cfg"  \
-       j842/docker-ansible /usr/local/bin/ansiblerun $1 \$@
+       -v "/root/dockeransible/ansible:/data"                   \
+       -v "/root/dockeransible/sshkeys:/sshkeys"                \
+       -v "/root/dockeransible/ansible.cfg:/root/.ansible.cfg"  \
+       ${IMAGENAME} /usr/local/bin/ansiblerun $1 \$@
 EOF
 chmod a+x /usr/local/bin/$1
 }
@@ -63,6 +61,5 @@ for CMD in ${COMMANDS[@]}; do
 done
 
 # get the latest docker image
-docker pull j842/docker-ansible
-
+docker pull ${IMAGENAME}
 ```
