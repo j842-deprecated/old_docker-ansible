@@ -35,12 +35,12 @@ if [ ! -e $1 ]; then
 fi
   
 # add the file
-if [ -d /tmp/ansible ]; then rm -rf /tmp/ansible ; fi
-mkdir /tmp/ansible ; cp $1 /tmp/ansible
+rm -rf /tmp/ansible ; mkdir /tmp/ansible ; cp $1 /tmp/ansible
 
 docker run --name ansiblecopy -v ansible-config:/config -v /tmp/ansible:/tmp/ansible ${CONTAINER_NAME} \
-   /bin/bash /usr/local/bin/copykeys.sh
+   /bin/bash /usr/local/bin/updateconfig.sh
 RVAL=$?
+
 docker rm ansiblecopy > /dev/null
 rm -rf /tmp/ansible
   

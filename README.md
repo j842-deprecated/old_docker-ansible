@@ -2,64 +2,22 @@
 
 A simple docker container to run Ansible. Available in Docker Hub as j842/ansible and github as j842/docker-ansible.
 
+In bin directory are a bunch of helper scripts. The ones needed are:
 
-Example:
+| Script    | Descrption | Usage              |
+|-----------|---------------------------------------------------------------------|----------------------|
+| install   | Install docker and add scripts to /usr/local/bin for accessing ansible. | install              |
+| init      | Initialise the Docker storage volume for the ansible settings       | init                 |
+| copykeys  | Copy all files from PATH into /root/.ssh in the docker container.   | copykeys PATH        |
+| setconfig | Set the ansible configuration file (/root/.ansible.cfg)             | setconfig CONFIGFILE |
+
+Having completed the above you should be able to run ansible, ansible-playbook etc from the host.
+
+The ansible config file defaults to:
 ```
-docker run -ti --rm -v "$(pwd)/data:/data" -v "$(pwd)/sshkeys:/sshkeys" j842/ansible ansiblerun COMMAND [OPTIONS]...
+[defaults]
+host_key_checking = false
+pipelining = true
 ```
 
-Script to do basic setup on a clean debian host:
-```
-#!/bin/bash
-
-IMAGENAME="j842/ansible"
-
-# install package if it doesn't exist, updating cache
-function checkinstall {
-if [ $(dpkg-query -W -f='${Status}' ${1} 2>/dev/null | grep -c "ok installed") -eq 0 ];
-then
-  apt-get update
-  apt-get install -y ${1};
-fi
-}
-
-# create a command which is run via docker
-function makefile {
-cat <<EOF | tr -s ' ' >/usr/local/bin/$1 
-#!/bin/bash
-
-docker run --name=ansible -ti --rm                              \
-       -v "/root/dockeransible/ansible:/data"                   \
-       -v "/root/dockeransible/sshkeys:/sshkeys"                \
-       -v "/root/dockeransible/ansible.cfg:/root/.ansible.cfg"  \
-       ${IMAGENAME} /usr/local/bin/ansiblerun $1 \$@
-EOF
-chmod a+x /usr/local/bin/$1
-}
-
-# ------------ INSTALL DOCKER --------------------------
-
-checkinstall apt-transport-https
-
-# add the dockerproject repository
-if [ ! -e /etc/apt/sources.list.d/docker.list ]; then
-  apt-key adv --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys 58118E89F3A912897C070ADBF76221572C52609D
-  echo deb https://apt.dockerproject.org/repo debian-jessie main > /etc/apt/sources.list.d/docker.list
-fi
-
-checkinstall docker-engine
-
-systemctl enable docker
-systemctl start docker
-
-# ------------ CONFIGURE ANSIBLE CONTAINER --------------------------
-
-# configure ansible commands
-COMMANDS=(ansible ansible-doc ansible-galaxy ansible-playbook ansible-pull ansible-vault)
-for CMD in ${COMMANDS[@]}; do
-  makefile $CMD
-done
-
-# get the latest docker image
-docker pull ${IMAGENAME}
-```
+By default no SSH keys are installed. Use copykeys to copy across suitable keys.
