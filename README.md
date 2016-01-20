@@ -4,12 +4,12 @@ A simple docker container to run Ansible. Available in Docker Hub as j842/ansibl
 
 In bin directory are a bunch of helper scripts. The ones needed are:
 
-| Script    | Descrption | Usage              |
-|-----------|---------------------------------------------------------------------|----------------------|
-| install   | Install docker and add scripts to /usr/local/bin for accessing ansible. | install              |
-| init      | Initialise the Docker storage volume for the ansible settings       | init                 |
-| copykeys  | Copy all files from PATH into /root/.ssh in the docker container.   | copykeys PATH        |
-| setconfig | Set the ansible configuration file (/root/.ansible.cfg)             | setconfig CONFIGFILE |
+| Script               | Descrption | 
+|----------------------|---------------------------------------------------------------------|
+| install              | Install docker and add scripts to /usr/local/bin for accessing ansible. | 
+| init                 | Initialise the Docker storage volume for the ansible settings       | 
+| copykeys PATH        | Copy all files from PATH into /root/.ssh in the docker container.   |   
+| setconfig CONFIGFILE | Set the ansible configuration file (/root/.ansible.cfg)             |  
 
 Having completed the above you should be able to run ansible, ansible-playbook etc from the host.
 
