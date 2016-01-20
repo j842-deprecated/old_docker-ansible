@@ -38,7 +38,8 @@ fi
 if [ -d /tmp/ansible ]; then rm -rf /tmp/ansible ; fi
 mkdir /tmp/ansible ; cp $1 /tmp/ansible
 
-docker run --name ansiblecopy -v ansible-config:/config -v /tmp/ansible:/tmp/ansible ${CONTAINER_NAME}  /bin/bash /usr/local/bin/updateconfig.sh
+docker run --name ansiblecopy -v ansible-config:/config -v /tmp/ansible:/tmp/ansible ${CONTAINER_NAME} \
+   /bin/bash /usr/local/bin/copykeys.sh
 RVAL=$?
 docker rm ansiblecopy > /dev/null
 rm -rf /tmp/ansible
