@@ -3,7 +3,7 @@
 # runs a command from the /data directory (where all our ansible files are)
 #
 
-cd /data ; $@
-#CMD=$1
-#shift
-#${CMD} $@
+cd /data 
+CMD=$1
+shift
+${CMD} $@
