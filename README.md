@@ -2,7 +2,9 @@
 
 A simple docker container to run Ansible. Available in Docker Hub as j842/ansible and github as j842/docker-ansible.
 
-In bin directory are a bunch of helper scripts. The ones needed are:
+Check out, then edit bin/bash.conf setting ANSIBLE_PATH to the location you want to store you ansible playbooks etc.
+
+Next you need to run the following scripts in bin:
 
 | Script               | Descrption | 
 |----------------------|---------------------------------------------------------------------|

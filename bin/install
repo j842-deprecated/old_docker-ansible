@@ -37,6 +37,7 @@ function makefile {
 
 docker run --name=ansible -ti                           \
        -v "${VOLUME_NAME}:/config"                      \
+       -v "${ANSIBLE_PATH}:/data"                         \
        ${IMAGENAME} /usr/local/bin/ansiblerun $1 \$@
 docker rm ansible  > /dev/null
 EOF
