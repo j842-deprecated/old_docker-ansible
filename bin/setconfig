@@ -29,13 +29,22 @@ RVAL=3
 if [ -z $1 ]; then
   showusage
 fi
+if [ ! -e $1 ]; then
+  echo "File $1 does not exist."
+  exit 1
+fi
+  
+# add the file
+if [ -d /tmp/ansible ]; then rm -rf /tmp/ansible ; fi
+mkdir /tmp/ansible ; cp $1 /tmp/ansible
 
-# populate the config directory with defaults
-docker run -it --name ansibleconfig -v ansible-config:/config -v ${1}:/ansible.cfg ${CONTAINER_NAME} /bin/bash updateconfig.sh
-docker rm ansibleconfig > /dev/null
-
+docker run --name ansiblecopy -v ansible-config:/config -v /tmp/ansible:/tmp/ansible ${CONTAINER_NAME}  /bin/bash /usr/local/bin/updateconfig.sh
+RVAL=$?
+docker rm ansiblecopy > /dev/null
+rm -rf /tmp/ansible
+  
 if [ "$RVAL" = 3 ]; then
-   echo "All volumes already initialised."
+   echo "Config file unchanged."
 fi
 
 exit $RVAL
