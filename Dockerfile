@@ -8,17 +8,17 @@ RUN apt-get update && \
     apt-transport-https software-properties-common \
     python-apt python-pycurl python-httplib2 \
     build-essential libssl-dev libffi-dev python-dev \
-    python-pip git
+    python-pip git nano
 
 RUN pip install ansible cryptography
 
 RUN rm -rf /root/.ssh
-RUN ln -s /root/.ssh /sshkeys
+RUN ln -s /config/sshkeys /root/.ssh 
+RUN ln -s /config/ansible.cfg /root/.ansible.cfg 
 
 RUN echo 'export EDITOR=nano' >> /root/.bashrc
 
-ADD ["./assets/ansiblerun","/usr/local/bin/ansiblerun"]
+ADD ["./assets/","/usr/local/bin/"]
 
-VOLUME ["/sshkeys","/data","/root/.ansible.cfg"]
-EXPOSE 22
+VOLUME ["/config","/data"]
 CMD ["/usr/local/bin/ansiblerun"]

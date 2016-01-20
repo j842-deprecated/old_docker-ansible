@@ -1,4 +1,0 @@
-docker run -it j842/ansible /bin/bash
-
-
-
