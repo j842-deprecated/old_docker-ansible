@@ -52,7 +52,7 @@ docker rm ansiblecopy > /dev/null
   
 getmd5  
 if [ "${MD5}" = "${OLDMD5}" ]; then
-   echo "No changes made."
+   echo "Keys unchanged."
    exit 3
 fi
   

@@ -14,14 +14,17 @@ if [ "$EUID" -ne 0 ]
   exit 1
 fi
 
-IMAGENAME="j842/ansible"
-RVAL=3
-UPDATED=0
-
 if [ $(uname -rv | grep -c "Debian") -eq 0 ]; then
   echo "This script is only for Debian hosts."
   exit 1
 fi
+
+
+IMAGENAME="j842/ansible"
+RVAL=3
+UPDATED=0
+
+echo "Checking installation of Docker and Docker-Ansible..."
 
 # install package if it doesn't exist, updating cache
 function checkinstall {
@@ -62,6 +65,9 @@ if [ ! -e /usr/local/bin/install_docker.sh ]; then
    chmod u+x /usr/local/bin/install_docker.sh
    RVAL=0
 fi
+
+echo "Checking Docker..."
+
 /usr/local/bin/install_docker.sh
 RVAL=$?
 
@@ -74,6 +80,7 @@ for CMD in ${COMMANDS[@]}; do
 done
 
 # get the latest docker image, set RVAL if changed.
+echo "Checking we have latest Docker-Ansible image..."
 if [ $(docker pull ${IMAGENAME} | grep -c "Image is up to date") -eq 0 ]; then
   RVAL=0
 fi
