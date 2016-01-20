@@ -1,0 +1,41 @@
+#!/bin/bash
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+. $DIR/bash.conf
+
+
+function showusage {
+cat <<EOF
+
+NAME
+   setconfig - set the configuration file for ansible
+
+SYNOPSIS
+   setconfig CONFIGFILE
+
+DESCRIPTION
+   Update .ansible.cfg with CONFIGFILE.
+
+RETURN VALUE
+   0   - success
+   1   - error
+   3   - no change
+   
+EOF
+   exit 1
+}
+
+RVAL=3
+
+if [ -z $1 ]; then
+  showusage
+fi
+
+# populate the config directory with defaults
+docker run -it --name ansibleconfig -v ansible-config:/config -v ${1}:/ansible.cfg ${CONTAINER_NAME} /bin/bash updateconfig.sh
+docker rm ansibleconfig > /dev/null
+
+if [ "$RVAL" = 3 ]; then
+   echo "All volumes already initialised."
+fi
+
+exit $RVAL
