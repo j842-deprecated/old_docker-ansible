@@ -10,7 +10,7 @@
 #     3 if nothing changed
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-. $DIR/bash.conf
+. "$DIR/bash.conf"
 
 IMAGENAME="j842/ansible"
 RVAL=3
@@ -31,7 +31,7 @@ fi
 
 # create a command which is run via docker
 function makefile {
-  if [ ! -e /usr/local/bin/$1 ]; then
+  if [ ! -e /usr/local/bin/"$1" ]; then
     cat <<EOF | tr -s ' ' >/usr/local/bin/$1 
 #!/bin/bash
 
@@ -41,7 +41,7 @@ docker run --name=ansible -ti                           \
        ${IMAGENAME} /usr/local/bin/ansiblerun $1 \$@
 docker rm ansible  > /dev/null
 EOF
-    chmod a+x /usr/local/bin/$1
+    chmod a+x /usr/local/bin/"$1"
     echo "Created /usr/local/bin/$1"
     RVAL=0
 fi 
@@ -51,7 +51,7 @@ fi
 
 # configure those ansible commands
 COMMANDS=(ansible ansible-doc ansible-galaxy ansible-playbook ansible-pull ansible-vault)
-for CMD in ${COMMANDS[@]}; do
+for CMD in "${COMMANDS[@]}"; do
   makefile $CMD
 done
 

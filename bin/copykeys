@@ -1,10 +1,10 @@
 #!/bin/bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-. $DIR/bash.conf
+. "$DIR/bash.conf"
 
 
 function getmd5 {
-  MD5=$(docker run --name ansiblecopy -v ${VOLUME_NAME}:/config ${CONTAINER_NAME} tar c config/sshkeys | md5sum)
+  MD5=$(docker run --name ansiblecopy -v "${VOLUME_NAME}":/config "${CONTAINER_NAME}" tar c config/sshkeys | md5sum)
   docker rm ansiblecopy > /dev/null
 }
 
@@ -31,10 +31,10 @@ EOF
 
 RVAL=3
 
-if [ -z $1 ]; then
+if [ -z "$1" ]; then
   showusage
 fi
-if [ ! -d $1 ]; then
+if [ ! -d "$1" ]; then
   echo "Directory $1 does not exist."
   exit 1
 fi
@@ -48,7 +48,8 @@ getmd5
 OLDMD5=${MD5}
 
 # can't use --rm or it kills the volume container. :/
-docker run --name ansiblecopy -v ${VOLUME_NAME}:/config -v ${1}:/tmp/sshkeys ${CONTAINER_NAME} /bin/cp -a /tmp/sshkeys/ /config
+docker run --name ansiblecopy -v "${VOLUME_NAME}:/config" -v "${1}:/tmp/sshkeys" \
+          "${CONTAINER_NAME}" /bin/cp -a /tmp/sshkeys/ /config
 RVAL=$?
 docker rm ansiblecopy > /dev/null
   

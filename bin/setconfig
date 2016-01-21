@@ -1,6 +1,6 @@
 #!/bin/bash
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-. $DIR/bash.conf
+. "$DIR/bash.conf"
 
 
 function showusage {
@@ -26,18 +26,18 @@ EOF
 
 RVAL=3
 
-if [ -z $1 ]; then
+if [ -z "$1" ]; then
   showusage
 fi
-if [ ! -e $1 ]; then
+if [ ! -e "$1" ]; then
   echo "File $1 does not exist."
   exit 1
 fi
   
 # add the file
-rm -rf /tmp/ansible ; mkdir /tmp/ansible ; cp $1 /tmp/ansible
+rm -rf /tmp/ansible ; mkdir /tmp/ansible ; cp "$1" /tmp/ansible
 
-docker run --name ansiblecopy -v ${VOLUME_NAME}:/config -v /tmp/ansible:/tmp/ansible ${CONTAINER_NAME} \
+docker run --name ansiblecopy -v "${VOLUME_NAME}:/config" -v "/tmp/ansible:/tmp/ansible" "${CONTAINER_NAME}" \
    /bin/bash /usr/local/bin/updateconfig.sh
 RVAL=$?
 
