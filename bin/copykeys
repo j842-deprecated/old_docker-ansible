@@ -4,8 +4,9 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 
 function getmd5 {
-  MD5=$(docker run --name ansiblecopy -v "${VOLUME_NAME}":/config "${CONTAINER_NAME}" tar c config/sshkeys | md5sum)
-  docker rm ansiblecopy > /dev/null
+  MD5=$(docker run --name ansiblemd5 -v "${VOLUME_VCMD}" \
+          "${CONTAINER_NAME}" tar c config/sshkeys | md5sum)
+  docker rm ansiblemd5 > /dev/null
 }
 
 function showusage {
@@ -48,7 +49,7 @@ getmd5
 OLDMD5=${MD5}
 
 # can't use --rm or it kills the volume container. :/
-docker run --name ansiblecopy -v "${VOLUME_NAME}:/config" -v "${1}:/tmp/sshkeys" \
+docker run --name ansiblecopy -v "${VOLUME_VCMD}" -v "${1}:/tmp/sshkeys" \
           "${CONTAINER_NAME}" /bin/cp -a /tmp/sshkeys/ /config
 RVAL=$?
 docker rm ansiblecopy > /dev/null

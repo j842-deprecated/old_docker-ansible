@@ -16,7 +16,8 @@ function ensurevolexists {
 ensurevolexists "${VOLUME_NAME}"
 
 # populate the config directory with defaults
-docker run -it --name ansibleconfig -v "${VOLUME_NAME}":/config "${CONTAINER_NAME}" /bin/bash /usr/local/bin/initconfig.sh
+docker run -it --name ansibleconfig -v "${VOLUME_VCMD}" \
+         "${CONTAINER_NAME}" /bin/bash /usr/local/bin/initconfig.sh
 docker rm ansibleconfig > /dev/null
 
 if [ "$RVAL" = 3 ]; then

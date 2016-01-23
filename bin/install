@@ -36,9 +36,8 @@ function makefile {
 #!/bin/bash
 
 docker run --name=ansible -ti                           \
-       -v "${VOLUME_NAME}:/config"                      \
-       -v "${ANSIBLE_PATH}:/data"                         \
-       ${IMAGENAME} /usr/local/bin/ansiblerun $1 \$@
+       -v "${VOLUME_VCMD}" -v "${ANSIBLE_VCMD}"         \
+       ${CONTAINER_NAME} /usr/local/bin/ansiblerun $1 \$@
 docker rm ansible  > /dev/null
 EOF
     chmod a+x /usr/local/bin/"$1"
@@ -57,7 +56,7 @@ done
 
 # get the latest docker image, set RVAL if changed.
 echo "Checking we have latest Docker-Ansible image..."
-if [ $(docker pull ${IMAGENAME} | grep -c "Image is up to date") -eq 0 ]; then
+if [ $(docker pull ${CONTAINER_NAME} | grep -c "Image is up to date") -eq 0 ]; then
   RVAL=0
 fi
 
