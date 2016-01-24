@@ -9,8 +9,8 @@ After checking out the repo, run the following scripts in bin:
 
 | Script               | Descrption | 
 |----------------------|---------------------------------------------------------------------|
-| bin/install              | Add ansiblesession script to /usr/local/bin.                        | 
-| bin/init                 | Initialise the Docker storage volume for the ansible settings.      | 
+| bin/install              | Install the main script (ansiblesession) in /usr/local/bin.                        | 
+| bin/init                 | Initialise the Docker storage volume (ansible-config-vol) for the ansible settings.      | 
 
 ## RUNNING
 
@@ -18,7 +18,8 @@ Having completed the above you can run with:
 ```
 ansiblesession PATH
 ```
-where PATH is the root path of the ansible repo/playbooks.
+where PATH is the root path of the ansible repo/playbooks on the host. This directory is mapped
+to /data in the container.
 
 ## CONFIGURATION
 
@@ -43,7 +44,7 @@ pwd > ~/.ansiblepath
 Set the ansible configuration file (/root/.ansible.cfg) by creating a config file on the host
 then running:
 ```
-setconfig CONFIGFILE
+bin/setconfig CONFIGFILE
 ```
 
 The ansible config file defaults to:
