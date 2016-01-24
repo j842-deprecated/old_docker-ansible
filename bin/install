@@ -112,15 +112,15 @@ EOF
 
 # check we're root on Debian and Docker is installed
 if [ "$EUID" -ne 0 ]; then 
-  echo "Please run as root"
+  echo "Please run as root" >&2
   exit 1
 fi
 if [ $(uname -rv | grep -c "Debian") -eq 0 ]; then
-  echo "This script is only for Debian hosts."
+  echo "This script is only for Debian hosts." >&2
   exit 1
 fi
 if ! command_exists docker ; then 
-  echo "Docker needs to be installed first."
+  echo "Docker needs to be installed first." >&2
   exit 1
 fi
 if [ $# -ne 0 ]; then showusage ; fi
