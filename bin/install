@@ -13,6 +13,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . "$DIR/bash.conf"
 
 GETPATH="${BINDIR}/ansible-getpath"
+ANSIBLEPATHCONFIGFILE="~/.ansiblepath"
 RVAL=3
 
 function showusage {
@@ -40,10 +41,7 @@ EOF
 # could run through all arguments and translate paths there too....
 function makefile {
   if [ ! -e "${BINDIR}/${1}" ]; then
-
-    PATHFILE="~/.ansiblepath"
-
-    cat <<EOF | tr -s ' ' >"${BINDIR}/$1"
+    cat <<EOF >"${BINDIR}/$1"
 #!/bin/bash
 
 # This script was installed as part of docker-ansible.
@@ -53,10 +51,10 @@ function makefile {
 # determine path to mount into container.
 ANSIBLE_PATH="\$1"
 if [ -z "\$ANSIBLE_PATH" ]; then
-   if [ -e "$PATHFILE" ]; then
-     ANSIBLE_PATH=$(<"$PATHFILE")
+   if [ -e "$ANSIBLEPATHCONFIGFILE" ]; then
+     ANSIBLE_PATH=\$(<"$ANSIBLEPATHCONFIGFILE")
    else
-     ANSIBLE_PATH=$(<pwd)
+     ANSIBLE_PATH=\$(pwd)
    fi
 fi
 
@@ -69,9 +67,9 @@ ANSIBLE_CDIR=\$(${GETPATH} "\$ANSIBLE_PATH")
 if [ \$? -ne 0 ]; then exit 1 ; fi
 
 # run the command in the container
-docker run --name=${1} -ti                           \
-       -v "${VOLUME_VCMD}" -v "\${ANSIBLE_VCMD}"         \
-       ${CONTAINER_NAME} ${BINDIR}/ansiblerun \${ANSIBLE_CDIR}
+docker run --name=${1} -ti                                      \\
+       -v "${VOLUME_VCMD}" -v "\${ANSIBLE_VCMD}"                \\
+       ${CONTAINER_NAME} ${BINDIR}/ansiblerun "\${ANSIBLE_CDIR}"
 docker rm ${1}  > /dev/null
 EOF
     chmod a+x ${BINDIR}/"$1"
