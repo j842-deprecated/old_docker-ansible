@@ -19,15 +19,13 @@ function showusage {
 cat <<EOF >&2
 
 NAME
-   install - Script to install the ansible commands.
+   install - Script to install ansiblesession
    
 SYNOPSIS
-   install PATH
+   install
 
 DESCRIPTION
-   Installs ansible scripts (e.g. ansible-playbook) to ${BINDIR}.
-   PATH is mounted in the Docker container to run commands within.
-   (Only PATH is accessible to ansible!)
+   Installs ansiblesession to ${BINDIR}.
    
 RETURN VALUE
    0   - success
@@ -36,6 +34,52 @@ RETURN VALUE
 EOF
    exit 1  
 }
+
+# create a command which is run via docker
+# translates pwd to suitable path in docker container under /data.
+# could run through all arguments and translate paths there too....
+function makefile {
+  if [ ! -e "${BINDIR}/${1}" ]; then
+
+    PATHFILE="~/.ansiblepath"
+
+    cat <<EOF | tr -s ' ' >"${BINDIR}/$1"
+#!/bin/bash
+
+# This script was installed as part of docker-ansible.
+# More info here:
+#   https://github.com/j842/docker-ansible
+
+# determine path to mount into container.
+ANSIBLE_PATH="\$1"
+if [ -z "\$ANSIBLE_PATH" ]; then
+   if [ -e "$PATHFILE" ]; then
+     ANSIBLE_PATH=$(<"$PATHFILE")
+   else
+     ANSIBLE_PATH=$(<pwd)
+   fi
+fi
+
+if [ ! -d "\$ANSIBLE_PATH" ]; then echo "Path does not exist: \$ANSIBLE_PATH" ; exit 1 ; fi
+
+ANSIBLE_VCMD="\${ANSIBLE_PATH}:${ANSIBLE_MOUNT}"
+
+# determine where pwd is in terms of the ansible container
+ANSIBLE_CDIR=\$(${GETPATH} "\$ANSIBLE_PATH")
+if [ \$? -ne 0 ]; then exit 1 ; fi
+
+# run the command in the container
+docker run --name=${1} -ti                           \
+       -v "${VOLUME_VCMD}" -v "\${ANSIBLE_VCMD}"         \
+       ${CONTAINER_NAME} ${BINDIR}/ansiblerun \${ANSIBLE_CDIR}
+docker rm ${1}  > /dev/null
+EOF
+    chmod a+x ${BINDIR}/"$1"
+    echo "Created ${BINDIR}/$1"
+    RVAL=0
+fi 
+}
+
 
 # check we're root on Debian and Docker is installed
 if [ "$EUID" -ne 0 ]; then 
@@ -50,39 +94,7 @@ if ! command_exists docker ; then
   echo "Docker needs to be installed first."
   exit 1
 fi
-if [ $# -ne 1 ]; then showusage ; fi
-SRCPATH="$1"
-if [ ! -d "${SRCPATH}" ]; then echo "Path ${SRCPATH} does not exist." ; exit 1 ; fi
-
-# create a command which is run via docker
-# translates pwd to suitable path in docker container under /data.
-# could run through all arguments and translate paths there too....
-function makefile {
-  if [ ! -e "${BINDIR}/${1}" ]; then
-    cat <<EOF | tr -s ' ' >"${BINDIR}/$1"
-#!/bin/bash
-
-# This script was installed as part of docker-ansible.
-# More info here:
-#   https://github.com/j842/docker-ansible
-
-# determine where pwd is in terms of the ansible container
-ANSIBLE_PATH="${SRCPATH}"
-ANSIBLE_VCMD="\${ANSIBLE_PATH}:${ANSIBLE_MOUNT}"
-ANSIBLE_DIR=\$(${GETPATH} ${SRCPATH})
-if [ \$? -ne 0 ]; then exit 1 ; fi
-
-# run the command in the container
-docker run --name=${1} -ti                           \
-       -v "${VOLUME_VCMD}" -v "\${ANSIBLE_VCMD}"         \
-       ${CONTAINER_NAME} ${BINDIR}/ansiblerun \${ANSIBLE_DIR} ${1} \$@
-docker rm ${1}  > /dev/null
-EOF
-    chmod a+x ${BINDIR}/"$1"
-    echo "Created ${BINDIR}/$1"
-    RVAL=0
-fi 
-}
+if [ $# -ne 0 ]; then showusage ; fi
 
 # ------------ CONFIGURE ANSIBLE CONTAINER --------------------------
 
@@ -94,17 +106,8 @@ if [ $? -ne 0 ]; then
   RVAL=0
 fi
 
-# configure those ansible commands
-COMMANDS=(ansible ansible-doc ansible-galaxy ansible-playbook ansible-pull ansible-vault)
-for CMD in "${COMMANDS[@]}"; do
-  makefile $CMD
-done
-
-# get the latest docker image, set RVAL if changed.
-#echo "Checking we have latest Docker-Ansible image..."
-#if [ $(docker pull "${CONTAINER_NAME}" | grep -c "Image is up to date") -eq 0 ]; then
-#  RVAL=0
-#fi
+# configure ansiblesession.
+makefile ansiblesession
 
 #------------------------
 

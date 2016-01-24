@@ -1,14 +1,39 @@
 #!/bin/bash
 
-if [ $# -ne 1 ]; then echo "ansible-getpath requires one argument (the ansible path)" ; exit 1 ; fi
+function showusage {
+cat <<EOF >&2
+
+NAME
+   ansible-getpath - determine the working directory for ansiblession
+   
+SYNOPSIS
+   ansible-getpath MOUNTPATH
+
+DESCRIPTION
+   Using the provided MOUNTPATH, determines where within that
+   ansiblesession should start based on the PWD on host.
+   
+RETURN VALUE
+   0   - success
+   1   - error
+   
+EOF
+   exit 1  
+}
+
+if [ $# -ne 1 ]; then 
+   showusage
+   fi
 
 ANSIBLE_PATH="$1"
 
 if [ ! -d ${ANSIBLE_PATH} ]; then echo "The path ${ANSIBLE_PATH} does not exist!" ; exit 1 ; fi
 
 PWD=$(pwd)
+
 # ensure there is a trailing slash on ANSIBLE_PATH.
 prefix="${ANSIBLE_PATH%/}/"
+
 # remove prefix from PWD.
 if [ "${PWD}" = "${ANSIBLE_PATH%/}" ]; then
    RELPATH=""
@@ -17,8 +42,7 @@ else
 fi
 
 if [ "$RELPATH" = "$PWD" ]; then 
-  echo "Must be run from within ${ANSIBLE_PATH}." >&2
-  exit 1
+  RELPATH=""
 fi
 
 echo "/data/${RELPATH}"
