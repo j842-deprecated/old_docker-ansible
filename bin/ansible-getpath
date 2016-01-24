@@ -1,0 +1,27 @@
+#!/bin/bash
+
+
+function path_without_prefix {
+    local prefix="$1/"
+    PATH="${2#$prefix}"
+}
+
+if [ $# -ne 1 ]; then echo "ansible-getpath requires one argument (the ansible path)" ; exit 1 ; fi
+
+ANSIBLE_PATH="$1"
+
+if [ ! -d ${ANSIBLE_PATH} ]; then echo "The path ${ANSIBLE_PATH} does not exist!" ; exit 1 ; fi
+
+PWD=$(pwd)
+# ensure there is a trailing slash on ANSIBLE_PATH.
+prefix="${ANSIBLE_PATH%/}/"
+# remove prefix from PWD.
+PATH="${PWD#$prefix}"
+
+if [ $PATH = $PWD ]; then 
+  echo "Must be run from within ${ANSIBLE_PATH}." >&2
+  exit 1
+fi
+
+echo "/data/${PATH}"
+exit 0
