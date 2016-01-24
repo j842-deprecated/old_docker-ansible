@@ -12,7 +12,7 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . "$DIR/bash.conf"
 
-GETPATH="${BINDIR}/ansible-getpath"
+GETPATH="/opt/ansiblesession-getpath"
 ANSIBLEPATHCONFIGFILE="~/.ansiblepath"
 RVAL=3
 
@@ -39,22 +39,43 @@ EOF
 # create a command which is run via docker
 # translates pwd to suitable path in docker container under /data.
 # could run through all arguments and translate paths there too....
-function makefile {
-  if [ ! -e "${BINDIR}/${1}" ]; then
-    cat <<EOF >"${BINDIR}/$1"
+function createansiblesession {
+  SCRIPTNAME="ansiblesession"
+  if [ ! -e "${BINDIR}/${SCRIPTNAME}" ]; then
+    cat <<EOF >"${BINDIR}/${SCRIPTNAME}"
 #!/bin/bash
 
 # This script was installed as part of docker-ansible.
 # More info here:
 #   https://github.com/j842/docker-ansible
 
+function showusage {
+   echo " "
+   echo "NAME"
+   echo "   $SCRIPTNAME - begin an ansible session"
+   echo " "
+   echo "SYNOPSIS"
+   echo " "
+   echo "   $SCRIPTNAME [PATH]"
+   echo " "
+   echo "DESCRIPTION"
+   echo "   Begins an ansible session, mounting the specified PATH at /data"
+   echo "   in the container. If no PATH is specified it will attempt to read"
+   echo "   $ANSIBLEPATHCONFIGFILE which can be created with:"
+   echo "       pwd > $ANSIBLEPATHCONFIGFILE"
+   echo " "
+   
+   exit 1
+}
+
 # determine path to mount into container.
 ANSIBLE_PATH="\$1"
+if [ "\$ANSIBLE_PATH" = "--help" ]; then showusage ; fi
 if [ -z "\$ANSIBLE_PATH" ]; then
    if [ -e "$ANSIBLEPATHCONFIGFILE" ]; then
      ANSIBLE_PATH=\$(<"$ANSIBLEPATHCONFIGFILE")
    else
-     ANSIBLE_PATH=\$(pwd)
+     showusage
    fi
 fi
 
@@ -67,13 +88,13 @@ ANSIBLE_CDIR=\$(${GETPATH} "\$ANSIBLE_PATH")
 if [ \$? -ne 0 ]; then exit 1 ; fi
 
 # run the command in the container
-docker run --name=${1} -ti                                      \\
+docker run --name=ansiblesession -h "\${HOSTNAME}-ansible" -ti  \\
        -v "${VOLUME_VCMD}" -v "\${ANSIBLE_VCMD}"                \\
        ${CONTAINER_NAME} ${BINDIR}/ansiblerun "\${ANSIBLE_CDIR}"
-docker rm ${1}  > /dev/null
+docker rm ansiblesession  > /dev/null
 EOF
-    chmod a+x ${BINDIR}/"$1"
-    echo "Created ${BINDIR}/$1"
+    chmod a+x "${BINDIR}/${SCRIPTNAME}"
+    echo "Created ${BINDIR}/${SCRIPTNAME}"
     RVAL=0
 fi 
 }
@@ -97,15 +118,16 @@ if [ $# -ne 0 ]; then showusage ; fi
 # ------------ CONFIGURE ANSIBLE CONTAINER --------------------------
 
 # put supporting script (ansible-getpath) in usr/local/bin
-diff "${DIR}/support/ansible-getpath" "${GETPATH}" >/dev/null 2>&1
+diff "${DIR}/support/ansiblesession-getpath" "${GETPATH}" >/dev/null 2>&1
 if [ $? -ne 0 ]; then 
-  cp ${DIR}/support/ansible-getpath "${GETPATH}"
+  cp ${DIR}/support/ansiblesession-getpath "${GETPATH}"
   chmod a+x "${GETPATH}"
+  echo "Created ${GETPATH}"
   RVAL=0
 fi
 
-# configure ansiblesession.
-makefile ansiblesession
+# create ansiblesession.
+createansiblesession
 
 #------------------------
 
