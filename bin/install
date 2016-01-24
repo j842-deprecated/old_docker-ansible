@@ -15,7 +15,6 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 SCRIPTNAME="ansiblesession"
 GETPATH="/opt/ansiblesession/getpath"
 ANSIBLEPATHCONFIGFILE="~/.ansiblepath"
-CFGFILE=\$(realpath "$ANSIBLEPATHCONFIGFILE")
 RVAL=3
 
 function showusage {
@@ -75,7 +74,7 @@ function showusage {
    echo "   Begins an ansible session, mounting the specified PATH at /data"
    echo "   in the container. If no PATH is specified it will attempt to read"
    echo "   $ANSIBLEPATHCONFIGFILE which can be created with:"
-   echo "       pwd > $CFGFILE"
+   echo "       pwd > $ANSIBLEPATHCONFIGFILE"
    echo " "
    
    exit 1
@@ -85,8 +84,10 @@ function showusage {
 ANSIBLE_PATH="\$1"
 if [ "\$ANSIBLE_PATH" = "--help" ]; then showusage ; fi
 if [ -z "\$ANSIBLE_PATH" ]; then
+   CFGFILE=\$(realpath ${ANSIBLEPATHCONFIGFILE})
+   
    if [ -e "\$CFGFILE" ]; then
-     ANSIBLE_PATH=\$(<"\$CFGFILE")
+     ANSIBLE_PATH=\$(<\${CFGFILE})
    else
      echo "Unable to determine path to use."
      showusage
