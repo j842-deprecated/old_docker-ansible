@@ -12,7 +12,7 @@ After checking out the repo, run the following scripts in bin:
 
 | Script               | Descrption | 
 |----------------------|---------------------------------------------------------------------|
-| bin/install              | Install the main script (ansiblesession) in /usr/local/bin.                        | 
+| bin/install              | Install the main script on the host (ansiblesession) in /usr/local/bin.                  | 
 | bin/init                 | Initialise the Docker storage volume (ansible-config-vol) for the ansible settings.      | 
 
 ## RUNNING
@@ -28,12 +28,12 @@ to /data in the container.
 
 ### SSH Keys
 
-Keys to access ansible clients are configured with:
+Keys to access clients can be copied into the configuration volume with:
 ```
 bin/copykeys PATH
 ```
 This will copy all files from PATH into /root/.ssh in the docker container.
-Until this is run there will be no SSH keys.
+Either run this or create keys in the ansible session (preserving the symlink from /root/.ssh).
 
 ### Default Path
 
@@ -41,10 +41,11 @@ You can set up a default path for the ansible repo/playbooks, e.g.
 ```
 pwd > ~/.ansiblepath
 ```
+This will be used if no PATH is specified on the commandline to ansiblesession.
 
 ### Ansible Configuration File
 
-Set the ansible configuration file (/root/.ansible.cfg) by creating a config file on the host
+You can set the standard ansible configuration file (/root/.ansible.cfg) by creating a config file on the host
 then running:
 ```
 bin/setconfig CONFIGFILE
