@@ -8,7 +8,7 @@ Next you need to run the following scripts in bin:
 
 | Script               | Descrption | 
 |----------------------|---------------------------------------------------------------------|
-| install              | Add scripts to /usr/local/bin for accessing ansible. | 
+| install PATH         | Add scripts to /usr/local/bin for accessing ansible files in PATH.  | 
 | init                 | Initialise the Docker storage volume for the ansible settings       | 
 | copykeys PATH        | Copy all files from PATH into /root/.ssh in the docker container.   |   
 | setconfig CONFIGFILE | Set the ansible configuration file (/root/.ansible.cfg)             |  

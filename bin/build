@@ -2,4 +2,6 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . "$DIR/bash.conf"
 
-docker build -t "${CONTAINER_NAME}" "$DIR/../"
+cd "$DIR/../"
+echo docker build -t "${CONTAINER_NAME}" .
+docker build -t "${CONTAINER_NAME}" .

@@ -3,7 +3,12 @@
 # runs a command from the /data directory (where all our ansible files are)
 #
 
-cd /data 
-CMD=$1
-shift
+DATAPATH=$1
+CMD=$2
+shift 2
+
+echo "cd ${DATAPATH}"
+cd ${DATAPATH}
+
+echo "${CMD} $@"
 ${CMD} $@

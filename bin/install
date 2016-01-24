@@ -87,9 +87,11 @@ fi
 # ------------ CONFIGURE ANSIBLE CONTAINER --------------------------
 
 # put supporting script (ansible-getpath) in usr/local/bin
-if [ ! -e "${GETPATH}" ]; then
+diff "${DIR}/support/ansible-getpath" "${GETPATH}" >/dev/null 2>&1
+if [ $? -ne 0 ]; then 
   cp ${DIR}/support/ansible-getpath "${GETPATH}"
   chmod a+x "${GETPATH}"
+  RVAL=0
 fi
 
 # configure those ansible commands
@@ -99,10 +101,10 @@ for CMD in "${COMMANDS[@]}"; do
 done
 
 # get the latest docker image, set RVAL if changed.
-echo "Checking we have latest Docker-Ansible image..."
-if [ $(docker pull "${CONTAINER_NAME}" | grep -c "Image is up to date") -eq 0 ]; then
-  RVAL=0
-fi
+#echo "Checking we have latest Docker-Ansible image..."
+#if [ $(docker pull "${CONTAINER_NAME}" | grep -c "Image is up to date") -eq 0 ]; then
+#  RVAL=0
+#fi
 
 #------------------------
 
