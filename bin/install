@@ -12,7 +12,8 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . "$DIR/bash.conf"
 
-GETPATH="/opt/ansiblesession-getpath"
+SCRIPTNAME="ansiblesession"
+GETPATH="/opt/ansiblesession/getpath"
 ANSIBLEPATHCONFIGFILE="~/.ansiblepath"
 RVAL=3
 
@@ -36,13 +37,24 @@ EOF
    exit 1  
 }
 
+# copy the script from $1 to $2 if it's different.
+function cpscript {
+   SSOURCE="$1"
+   STARGET="$2"
+   diff "$SSOURCE" "$STARGET" >/dev/null 2>&1
+   if [ $? -ne 0 ]; then 
+      cp "$SSOURCE" "$STARGET"
+      chmod a+x "$STARGET"
+      echo "Created $STARGET"
+      RVAL=0
+   fi
+}
+
 # create a command which is run via docker
 # translates pwd to suitable path in docker container under /data.
 # could run through all arguments and translate paths there too....
 function createansiblesession {
-  SCRIPTNAME="ansiblesession"
-  if [ ! -e "${BINDIR}/${SCRIPTNAME}" ]; then
-    cat <<EOF >"${BINDIR}/${SCRIPTNAME}"
+  cat <<EOF >"/tmp/${SCRIPTNAME}"
 #!/bin/bash
 
 # This script was installed as part of docker-ansible.
@@ -93,10 +105,8 @@ docker run --name=ansiblesession -h "\${HOSTNAME}-ansible" -ti  \\
        ${CONTAINER_NAME} ${BINDIR}/ansiblerun "\${ANSIBLE_CDIR}"
 docker rm ansiblesession  > /dev/null
 EOF
-    chmod a+x "${BINDIR}/${SCRIPTNAME}"
-    echo "Created ${BINDIR}/${SCRIPTNAME}"
-    RVAL=0
-fi 
+
+   cpscript "/tmp/${SCRIPTNAME}" "${BINDIR}/${SCRIPTNAME}"
 }
 
 
@@ -118,13 +128,8 @@ if [ $# -ne 0 ]; then showusage ; fi
 # ------------ CONFIGURE ANSIBLE CONTAINER --------------------------
 
 # put supporting script (ansible-getpath) in usr/local/bin
-diff "${DIR}/support/ansiblesession-getpath" "${GETPATH}" >/dev/null 2>&1
-if [ $? -ne 0 ]; then 
-  cp ${DIR}/support/ansiblesession-getpath "${GETPATH}"
-  chmod a+x "${GETPATH}"
-  echo "Created ${GETPATH}"
-  RVAL=0
-fi
+if [ ! -d "/opt/ansiblesession" ]; then mkdir "/opt/ansiblession" ; fi
+cpscript "${DIR}/support/getpath" "${GETPATH}"
 
 # create ansiblesession.
 createansiblesession
