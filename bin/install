@@ -128,7 +128,7 @@ if [ $# -ne 0 ]; then showusage ; fi
 # ------------ CONFIGURE ANSIBLE CONTAINER --------------------------
 
 # put supporting script (ansible-getpath) in usr/local/bin
-if [ ! -d "/opt/ansiblesession" ]; then mkdir "/opt/ansiblession" ; fi
+if [ ! -d "/opt/ansiblesession" ]; then mkdir "/opt/ansiblesession" ; fi
 cpscript "${DIR}/support/getpath" "${GETPATH}"
 
 # create ansiblesession.
