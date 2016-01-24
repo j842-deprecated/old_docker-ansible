@@ -5,8 +5,5 @@
 
 DATAPATH=$1
 
-echo "cd ${DATAPATH}"
 cd ${DATAPATH}
-
-echo "bash"
 bash
