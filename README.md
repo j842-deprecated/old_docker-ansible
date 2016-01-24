@@ -1,6 +1,6 @@
 # docker-ansible
 
-A simple docker container to run Ansible. Available in Docker Hub as j842/ansible and github as j842/docker-ansible.
+A simple docker container to run Ansible. Available in Docker Hub as [j842/ansible](https://hub.docker.com/r/j842/ansible/) and GitHub as [j842/docker-ansible](https://github.com/j842/docker-ansible).
 
 
 ## SCRIPTS
