@@ -1,9 +1,12 @@
 # docker-ansible
 
-A simple docker container to run Ansible. Available in Docker Hub as [j842/ansible](https://hub.docker.com/r/j842/ansible/) and GitHub as [j842/docker-ansible](https://github.com/j842/docker-ansible).
+A simple docker container to run an interactive Ansible session, using playbooks stored on the host.
+Configuration (SSH Keys and the Ansible configuration file) are stored in a volume container.
+All work is done as root user in the container. 
+Available in Docker Hub as [j842/ansible](https://hub.docker.com/r/j842/ansible/) and GitHub as [j842/docker-ansible](https://github.com/j842/docker-ansible).
 
 
-## SCRIPTS
+## INSTALLATION
 
 After checking out the repo, run the following scripts in bin:
 
@@ -30,7 +33,7 @@ Keys to access ansible clients are configured with:
 bin/copykeys PATH
 ```
 This will copy all files from PATH into /root/.ssh in the docker container.
-No SSH keys are installed by default.
+Until this is run there will be no SSH keys.
 
 ### Default Path
 
