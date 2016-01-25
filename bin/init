@@ -14,6 +14,7 @@ function ensurevolexists {
 }
 
 ensurevolexists "${VOLUME_NAME}"
+ensurevolexists "
 
 # populate the config directory with defaults
 docker run -it --name ansibleconfig -v "${VOLUME_VCMD}" \

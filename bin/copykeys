@@ -16,7 +16,7 @@ NAME
    copykeys - copy the ssh keys to be used by ansible.
 
 SYNOPSIS
-   copykeys PATH
+   copykeys PATH [NAME]
 
 DESCRIPTION
    Copy all files from PATH into /root/.ssh in the docker container.

@@ -21,4 +21,5 @@ RUN echo 'export EDITOR=nano' >> /root/.bashrc
 ADD ["./assets/","/usr/local/bin/"]
 
 VOLUME ["/config","/data"]
-CMD ["/usr/local/bin/ansiblerun"]
+WORKDIR ["/data"]
+CMD ["/bin/bash"]

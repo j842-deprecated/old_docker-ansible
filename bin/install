@@ -12,9 +12,11 @@
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 . "$DIR/bash.conf"
 
-SCRIPTNAME="ansiblesession"
-GETPATH="/opt/ansiblesession/getpath"
-ANSIBLEPATHCONFIGFILE="~/.ansiblepath"
+if [ -z $1 ]; then 
+   SCRIPTNAME="ansiblesession"
+else
+   SCRIPTNAME="ansiblesession-${1}"
+fi
 RVAL=3
 
 function showusage {
@@ -24,10 +26,11 @@ NAME
    install - Script to install ansiblesession
    
 SYNOPSIS
-   install
+   install [NAME]
 
 DESCRIPTION
-   Installs ansiblesession to ${BINDIR}.
+   Installs ansiblesession to ${BINDIR}. NAME allows multiple named
+   installations on one host.
    
 RETURN VALUE
    0   - success
@@ -68,33 +71,14 @@ function showusage {
    echo " "
    echo "SYNOPSIS"
    echo " "
-   echo "   $SCRIPTNAME [PATH]"
+   echo "   $SCRIPTNAME"
    echo " "
    echo "DESCRIPTION"
-   echo "   Begins an ansible session, mounting the specified PATH at /data"
-   echo "   in the container. If no PATH is specified it will attempt to read"
-   echo "   $ANSIBLEPATHCONFIGFILE which can be created with:"
-   echo "       pwd > $ANSIBLEPATHCONFIGFILE"
+   echo "   Begins an ansible session."
    echo " "
    
    exit 1
 }
-
-# determine path to mount into container.
-ANSIBLE_PATH="\$1"
-if [ "\$ANSIBLE_PATH" = "--help" ]; then showusage ; fi
-if [ -z "\$ANSIBLE_PATH" ]; then
-   CFGFILE=\$(realpath ${ANSIBLEPATHCONFIGFILE})
-   
-   if [ -e "\$CFGFILE" ]; then
-     ANSIBLE_PATH=\$(<\${CFGFILE})
-   else
-     echo "Unable to determine path to use."
-     showusage
-   fi
-fi
-
-if [ ! -d "\$ANSIBLE_PATH" ]; then echo "Path does not exist: \$ANSIBLE_PATH" ; exit 1 ; fi
 
 ANSIBLE_VCMD="\${ANSIBLE_PATH}:${ANSIBLE_MOUNT}"
 
@@ -126,13 +110,10 @@ if ! command_exists docker ; then
   echo "Docker needs to be installed first." >&2
   exit 1
 fi
-if [ $# -ne 0 ]; then showusage ; fi
+if [ $# -gt 1 ]; then showusage ; fi
+
 
 # ------------ CONFIGURE ANSIBLE CONTAINER --------------------------
-
-# put supporting script (ansible-getpath) in usr/local/bin
-if [ ! -d "/opt/ansiblesession" ]; then mkdir "/opt/ansiblesession" ; fi
-cpscript "${DIR}/support/getpath" "${GETPATH}"
 
 # create ansiblesession.
 createansiblesession
