@@ -1,0 +1,8 @@
+#!/bin/bash
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+CONTAINER_SHORTNAME="ansible"
+CONTAINER_PREFIX=j842
+CONTAINER_NAME="${CONTAINER_PREFIX}/${CONTAINER_SHORTNAME}"
+
+docker build -t "${CONTAINER_NAME}" ${DIR}

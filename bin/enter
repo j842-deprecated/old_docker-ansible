@@ -1,6 +1,0 @@
-#!/bin/bash
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-. "$DIR/bash.conf"
-
-docker run -it --name ansible-enter "${CONTAINER_NAME}" /bin/bash
-docker rm ansible-enter  > /dev/null

@@ -18,8 +18,6 @@ RUN ln -s /config/ansible.cfg /root/.ansible.cfg
 
 RUN echo 'export EDITOR=nano' >> /root/.bashrc
 
-ADD ["./assets/","/usr/local/bin/"]
-
 VOLUME ["/config","/data"]
 WORKDIR ["/data"]
 CMD ["/bin/bash"]

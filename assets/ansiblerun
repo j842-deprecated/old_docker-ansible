@@ -1,9 +1,0 @@
-#!/bin/bash
-#
-# runs a command from the /data directory (where all our ansible files are)
-#
-
-DATAPATH=$1
-
-cd ${DATAPATH}
-bash
